@@ -1,11 +1,11 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as amqp from 'amqplib';
+import { connect, Connection, Channel } from 'amqplib';
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
-  private connection: amqp.Connection;
-  private channel: amqp.Channel;
+  private connection: Connection;
+  private channel: Channel;
   private isConnected = false;
 
   constructor(private configService: ConfigService) {}
@@ -20,7 +20,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   private async connect() {
     try {
-      this.connection = await amqp.connect(
+      this.connection = await connect(
         this.configService.get('RABBITMQ_URL'),
       );
 
