@@ -1,6 +1,6 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createClient, RedisClientType } from 'redis';
+import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createClient, RedisClientType } from "redis";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -21,26 +21,26 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     try {
       this.client = createClient({
         socket: {
-          host: this.configService.get('REDIS_HOST'),
-          port: +this.configService.get('REDIS_PORT'),
+          host: this.configService.get("REDIS_HOST"),
+          port: +this.configService.get("REDIS_PORT"),
         },
-        password: this.configService.get('REDIS_PASSWORD') || undefined,
-        database: +this.configService.get('REDIS_DB') || 0,
+        password: this.configService.get("REDIS_PASSWORD") || undefined,
+        database: +this.configService.get("REDIS_DB") || 0,
       });
 
-      this.client.on('error', (err) => {
-        console.error('Redis Client Error:', err);
+      this.client.on("error", (err) => {
+        console.error("Redis Client Error:", err);
         this.isConnected = false;
       });
 
-      this.client.on('connect', () => {
-        console.log('Redis connected successfully');
+      this.client.on("connect", () => {
+        console.log("Redis connected successfully");
         this.isConnected = true;
       });
 
       await this.client.connect();
     } catch (error) {
-      console.error('Failed to connect to Redis:', error);
+      console.error("Failed to connect to Redis:", error);
       throw error;
     }
   }
@@ -49,7 +49,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     if (this.client) {
       await this.client.quit();
       this.isConnected = false;
-      console.log('Redis disconnected');
+      console.log("Redis disconnected");
     }
   }
 
@@ -81,11 +81,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   // Lock Operations
   async acquireLock(key: string, ttl: number = 10000): Promise<boolean> {
-    const result = await this.client.set(`lock:${key}`, '1', {
+    const result = await this.client.set(`lock:${key}`, "1", {
       NX: true,
       PX: ttl,
     });
-    return result === 'OK';
+    return result === "OK";
   }
 
   async releaseLock(key: string): Promise<void> {
@@ -110,11 +110,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   // List Operations
-  async lPush(key: string, ..values: string[]): Promise<void> {
+  async lPush(key: string, ...values: string[]): Promise<void> {
     await this.client.lPush(key, values);
   }
 
-  async rPush(key: string, ..values: string[]): Promise<void> {
+  async rPush(key: string, ...values: string[]): Promise<void> {
     await this.client.rPush(key, values);
   }
 
@@ -131,7 +131,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Set Operations
-  async sAdd(key: string, ..members: string[]): Promise<void> {
+  async sAdd(key: string, ...members: string[]): Promise<void> {
     await this.client.sAdd(key, members);
   }
 
@@ -139,7 +139,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.sMembers(key);
   }
 
-  async sRem(key: string, ..members: string[]): Promise<void> {
+  async sRem(key: string, ...members: string[]): Promise<void> {
     await this.client.sRem(key, members);
   }
 
@@ -156,7 +156,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async getStats(): Promise<any> {
     const info = await this.client.info();
     const dbSize = await this.client.dbSize();
-    
+
     return {
       connected: this.isConnected,
       dbSize,
@@ -165,16 +165,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   private parseRedisInfo(info: string): any {
-    const lines = info.split('\r\n');
+    const lines = info.split("\r\n");
     const parsed: any = {};
-    let section = '';
+    let section = "";
 
     for (const line of lines) {
-      if (line.startsWith('#')) {
+      if (line.startsWith("#")) {
         section = line.substring(2).toLowerCase();
         parsed[section] = {};
-      } else if (line.includes(':')) {
-        const [key, value] = line.split(':');
+      } else if (line.includes(":")) {
+        const [key, value] = line.split(":");
         if (section) {
           parsed[section][key] = value;
         }
@@ -188,7 +188,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async isHealthy(): Promise<boolean> {
     try {
       const result = await this.client.ping();
-      return result === 'PONG';
+      return result === "PONG";
     } catch (error) {
       return false;
     }
