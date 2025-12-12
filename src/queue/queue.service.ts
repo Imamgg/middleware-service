@@ -1,6 +1,6 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as amqp from 'amqplib';
+import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import * as amqp from "amqplib";
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
@@ -21,16 +21,16 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   private async connect() {
     try {
       this.connection = await amqp.connect(
-        this.configService.get('RABBITMQ_URL'),
+        this.configService.get("RABBITMQ_URL")
       );
 
-      this.connection.on('error', (err) => {
-        console.error('RabbitMQ Connection Error:', err);
+      this.connection.on("error", (err) => {
+        console.error("RabbitMQ Connection Error:", err);
         this.isConnected = false;
       });
 
-      this.connection.on('close', () => {
-        console.log('RabbitMQ Connection Closed');
+      this.connection.on("close", () => {
+        console.log("RabbitMQ Connection Closed");
         this.isConnected = false;
       });
 
@@ -40,9 +40,9 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       // Declare queues
       await this.declareQueues();
 
-      console.log('RabbitMQ connected successfully');
+      console.log("RabbitMQ connected successfully");
     } catch (error) {
-      console.error('Failed to connect to RabbitMQ:', error);
+      console.error("Failed to connect to RabbitMQ:", error);
       throw error;
     }
   }
@@ -56,18 +56,18 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
         await this.connection.close();
       }
       this.isConnected = false;
-      console.log('RabbitMQ disconnected');
+      console.log("RabbitMQ disconnected");
     } catch (error) {
-      console.error('Error disconnecting from RabbitMQ:', error);
+      console.error("Error disconnecting from RabbitMQ:", error);
     }
   }
 
   private async declareQueues() {
     const queues = [
-      'grade_notifications',
-      'report_generation',
-      'email_queue',
-      'log_queue',
+      "grade_notifications",
+      "report_generation",
+      "email_queue",
+      "log_queue",
     ];
 
     for (const queue of queues) {
@@ -83,7 +83,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       const sent = this.channel.sendToQueue(
         queue,
         Buffer.from(JSON.stringify(message)),
-        { persistent: true },
+        { persistent: true }
       );
       console.log(`Message published to ${queue}:`, message);
       return sent;
@@ -96,12 +96,12 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   // Consume messages from queue
   async consume(
     queue: string,
-    callback: (message: any) => Promise<void>,
+    callback: (message: any) => Promise<void>
   ): Promise<void> {
     await this.channel.assertQueue(queue, { durable: true });
     await this.channel.prefetch(1);
 
-    console.log(`Waiting for messages in ${queue}...`);
+    console.log(`Waiting for messages in ${queue}..`);
 
     this.channel.consume(
       queue,
@@ -110,9 +110,9 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
           try {
             const content = JSON.parse(msg.content.toString());
             console.log(`Processing message from ${queue}:`, content);
-            
+
             await callback(content);
-            
+
             this.channel.ack(msg);
             console.log(`Message acknowledged from ${queue}`);
           } catch (error) {
@@ -122,7 +122,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
           }
         }
       },
-      { noAck: false },
+      { noAck: false }
     );
   }
 
@@ -143,10 +143,10 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   // Get all queues stats
   async getAllQueuesStats(): Promise<any[]> {
     const queues = [
-      'grade_notifications',
-      'report_generation',
-      'email_queue',
-      'log_queue',
+      "grade_notifications",
+      "report_generation",
+      "email_queue",
+      "log_queue",
     ];
 
     const stats = [];

@@ -1,12 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
-import { RedisService } from '../redis/redis.service';
-import { QueueService } from '../queue/queue.service';
+import { Controller, Get } from "@nestjs/common";
+import { RedisService } from "./redis/redis.service";
+import { QueueService } from "./queue/queue.service";
 
-@Controller('api/health')
+@Controller("api/health")
 export class HealthController {
   constructor(
     private redisService: RedisService,
-    private queueService: QueueService,
+    private queueService: QueueService
   ) {}
 
   @Get()
@@ -17,37 +17,37 @@ export class HealthController {
     const overall = redisHealthy && queueHealthy;
 
     return {
-      status: overall ? 'healthy' : 'unhealthy',
+      status: overall ? "healthy" : "unhealthy",
       timestamp: new Date().toISOString(),
       services: {
         redis: {
-          status: redisHealthy ? 'up' : 'down',
+          status: redisHealthy ? "up" : "down",
         },
         rabbitmq: {
-          status: queueHealthy ? 'up' : 'down',
+          status: queueHealthy ? "up" : "down",
         },
       },
     };
   }
 
-  @Get('redis')
+  @Get("redis")
   async checkRedis() {
     const healthy = await this.redisService.isHealthy();
     const stats = healthy ? await this.redisService.getStats() : null;
 
     return {
-      status: healthy ? 'up' : 'down',
+      status: healthy ? "up" : "down",
       stats,
     };
   }
 
-  @Get('queue')
+  @Get("queue")
   async checkQueue() {
     const healthy = await this.queueService.isHealthy();
     const stats = healthy ? await this.queueService.getAllQueuesStats() : null;
 
     return {
-      status: healthy ? 'up' : 'down',
+      status: healthy ? "up" : "down",
       queues: stats,
     };
   }

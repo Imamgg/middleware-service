@@ -110,11 +110,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   // List Operations
-  async lPush(key: string, ...values: string[]): Promise<void> {
+  async lPush(key: string, ..values: string[]): Promise<void> {
     await this.client.lPush(key, values);
   }
 
-  async rPush(key: string, ...values: string[]): Promise<void> {
+  async rPush(key: string, ..values: string[]): Promise<void> {
     await this.client.rPush(key, values);
   }
 
@@ -131,7 +131,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Set Operations
-  async sAdd(key: string, ...members: string[]): Promise<void> {
+  async sAdd(key: string, ..members: string[]): Promise<void> {
     await this.client.sAdd(key, members);
   }
 
@@ -139,7 +139,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.client.sMembers(key);
   }
 
-  async sRem(key: string, ...members: string[]): Promise<void> {
+  async sRem(key: string, ..members: string[]): Promise<void> {
     await this.client.sRem(key, members);
   }
 

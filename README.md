@@ -3,6 +3,7 @@
 Service untuk mengelola Redis Cache, RabbitMQ Queue, dan Background Workers dalam Sistem SIAKAD Terdistribusi.
 
 ## Fitur
+
 - ✅ **Redis Management** - Cache, Lock, Hash, List, Set operations
 - ✅ **RabbitMQ Queue Management** - Publish, Consume, Stats
 - ✅ **Background Workers** - Email notifications, Report generation
@@ -10,10 +11,12 @@ Service untuk mengelola Redis Cache, RabbitMQ Queue, dan Background Workers dala
 - ✅ **Email Service** - SMTP integration untuk notifikasi
 
 ## Konfigurasi
+
 Port: **3004**  
-IP VM: **192.168.192.15**
+IP VM: **192.168.10.15**
 
 ## Environment Variables
+
 ```env
 PORT=3004
 
@@ -41,11 +44,13 @@ WORKER_CONCURRENCY=5
 ```
 
 ## Install Dependencies
+
 ```bash
 npm install
 ```
 
 ## Run Service
+
 ```bash
 # Development
 npm run start:dev
@@ -56,7 +61,9 @@ npm run start:prod
 ```
 
 ## Run Workers (Background Process)
+
 Worker terpisah untuk memproses queue secara asynchronous:
+
 ```bash
 # Development
 ts-node src/workers/queue-worker.ts
@@ -69,11 +76,13 @@ npm run worker
 ## API Endpoints
 
 ### Health Check
+
 - `GET /api/health` - Overall health check
 - `GET /api/health/redis` - Redis health & stats
 - `GET /api/health/queue` - RabbitMQ health & queue stats
 
 ### Redis Management
+
 - `GET /api/redis/stats` - Redis statistics
 - `GET /api/redis/health` - Redis health check
 - `GET /api/redis/keys?pattern=*` - Get keys by pattern
@@ -102,6 +111,7 @@ npm run worker
   ```
 
 ### RabbitMQ Queue Management
+
 - `GET /api/queue/stats` - All queues statistics
 - `GET /api/queue/stats/:queue` - Specific queue stats
 - `GET /api/queue/health` - RabbitMQ health check
@@ -122,7 +132,9 @@ npm run worker
 ## Available Queues
 
 ### 1. `grade_notifications`
+
 Notifikasi nilai ke mahasiswa via email.
+
 ```json
 {
   "studentNim": "2024001",
@@ -133,7 +145,9 @@ Notifikasi nilai ke mahasiswa via email.
 ```
 
 ### 2. `report_generation`
+
 Generate transkrip atau report akademik.
+
 ```json
 {
   "type": "transcript",
@@ -143,7 +157,9 @@ Generate transkrip atau report akademik.
 ```
 
 ### 3. `email_queue`
+
 Queue untuk email custom.
+
 ```json
 {
   "to": "student@example.com",
@@ -153,7 +169,9 @@ Queue untuk email custom.
 ```
 
 ### 4. `log_queue`
+
 Logging events.
+
 ```json
 {
   "level": "info",
@@ -165,13 +183,15 @@ Logging events.
 ## Request Examples
 
 ### Health Check
+
 ```bash
-curl http://192.168.192.15:3004/api/health
+curl http://192.168.10.15:3004/api/health
 ```
 
 ### Set Cache
+
 ```bash
-curl -X POST http://192.168.192.15:3004/api/redis/cache \
+curl -X POST http://192.168.10.15:3004/api/redis/cache \
   -H "Content-Type: application/json" \
   -d '{
     "key": "student:2024001",
@@ -181,13 +201,15 @@ curl -X POST http://192.168.192.15:3004/api/redis/cache \
 ```
 
 ### Get Cache
+
 ```bash
-curl http://192.168.192.15:3004/api/redis/cache/student:2024001
+curl http://192.168.10.15:3004/api/redis/cache/student:2024001
 ```
 
 ### Acquire Lock
+
 ```bash
-curl -X POST http://192.168.192.15:3004/api/redis/lock/acquire \
+curl -X POST http://192.168.10.15:3004/api/redis/lock/acquire \
   -H "Content-Type: application/json" \
   -d '{
     "key": "enrollment:course:1",
@@ -196,8 +218,9 @@ curl -X POST http://192.168.192.15:3004/api/redis/lock/acquire \
 ```
 
 ### Publish to Queue
+
 ```bash
-curl -X POST http://192.168.192.15:3004/api/queue/publish \
+curl -X POST http://192.168.10.15:3004/api/queue/publish \
   -H "Content-Type: application/json" \
   -d '{
     "queue": "grade_notifications",
@@ -211,20 +234,24 @@ curl -X POST http://192.168.192.15:3004/api/queue/publish \
 ```
 
 ### Queue Stats
+
 ```bash
-curl http://192.168.192.15:3004/api/queue/stats
+curl http://192.168.10.15:3004/api/queue/stats
 ```
 
 ## Setup Redis di VM5
 
 ### Install Redis
+
 ```bash
 sudo apt update
 sudo apt install redis-server -y
 ```
 
 ### Konfigurasi Redis
+
 Edit `/etc/redis/redis.conf`:
+
 ```conf
 bind 0.0.0.0
 protected-mode no
@@ -232,6 +259,7 @@ port 6379
 ```
 
 ### Start Redis
+
 ```bash
 sudo systemctl start redis-server
 sudo systemctl enable redis-server
@@ -239,6 +267,7 @@ sudo systemctl status redis-server
 ```
 
 ### Test Redis
+
 ```bash
 redis-cli ping
 # Response: PONG
@@ -247,12 +276,14 @@ redis-cli ping
 ## Setup RabbitMQ di VM5
 
 ### Install RabbitMQ
+
 ```bash
 sudo apt update
 sudo apt install rabbitmq-server -y
 ```
 
 ### Start RabbitMQ
+
 ```bash
 sudo systemctl start rabbitmq-server
 sudo systemctl enable rabbitmq-server
@@ -260,16 +291,19 @@ sudo systemctl status rabbitmq-server
 ```
 
 ### Enable Management Plugin
+
 ```bash
 sudo rabbitmq-plugins enable rabbitmq_management
 ```
 
 ### Access Management UI
-- URL: `http://192.168.192.15:15672`
+
+- URL: `http://192.168.10.15:15672`
 - Username: `guest`
 - Password: `guest`
 
 ### Create User (Optional)
+
 ```bash
 sudo rabbitmqctl add_user siakad_user admin
 sudo rabbitmqctl set_user_tags siakad_user administrator
@@ -281,6 +315,7 @@ sudo rabbitmqctl set_permissions -p / siakad_user ".*" ".*" ".*"
 1. **Install Redis & RabbitMQ** (lihat di atas)
 
 2. **Deploy Middleware Service**
+
 ```bash
 cd /opt
 sudo mkdir middleware-service
@@ -291,11 +326,13 @@ npm run build
 ```
 
 3. **Run Service**
+
 ```bash
 npm run start:prod
 ```
 
 4. **Run Worker (sebagai background process)**
+
 ```bash
 # Install PM2
 npm install -g pm2
@@ -314,6 +351,7 @@ pm2 startup
 ## Monitoring
 
 ### Check Redis Stats
+
 ```bash
 redis-cli info stats
 redis-cli dbsize
@@ -321,12 +359,14 @@ redis-cli keys '*'
 ```
 
 ### Check RabbitMQ Stats
+
 ```bash
 sudo rabbitmqctl list_queues name messages consumers
 sudo rabbitmqctl list_connections
 ```
 
 ### PM2 Monitoring
+
 ```bash
 pm2 status
 pm2 logs middleware-worker
@@ -347,25 +387,28 @@ Middleware Worker → Email Service → SMTP
 ## Integration dengan Service Lain
 
 ### Course Service
+
 ```typescript
 // Acquire lock sebelum enrollment
 const lockAcquired = await redisService.acquireLock(`enrollment:${courseId}`);
 ```
 
 ### Grades Service
+
 ```typescript
 // Publish notifikasi setelah finalize
 await rabbitmqService.publishGradeNotification({
-  studentNim: '2024001',
-  courseName: 'Pemrograman Dasar',
-  letterGrade: 'A',
-  finalScore: 87.5
+  studentNim: "2024001",
+  courseName: "Pemrograman Dasar",
+  letterGrade: "A",
+  finalScore: 87.5,
 });
 ```
 
 ## Troubleshooting
 
 **Redis tidak bisa diakses dari service lain:**
+
 ```bash
 # Edit /etc/redis/redis.conf
 bind 0.0.0.0
@@ -376,6 +419,7 @@ sudo systemctl restart redis-server
 ```
 
 **RabbitMQ connection refused:**
+
 ```bash
 # Check firewall
 sudo ufw allow 5672
@@ -386,4 +430,5 @@ sudo systemctl restart rabbitmq-server
 ```
 
 ## License
+
 Educational Project - Sistem Terdistribusi 2025/2026
