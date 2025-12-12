@@ -4,8 +4,8 @@ import * as amqp from "amqplib";
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
-  private connection: amqp.Connection;
-  private channel: amqp.Channel;
+  private connection: any;
+  private channel: any;
   private isConnected = false;
 
   constructor(private configService: ConfigService) {}
@@ -20,9 +20,9 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   private async connect() {
     try {
-      this.connection = (await amqp.connect(
+      this.connection = await amqp.connect(
         this.configService.get("RABBITMQ_URL")
-      )) as amqp.Connection;
+      );
 
       this.connection.on("error", (err) => {
         console.error("RabbitMQ Connection Error:", err);
@@ -34,7 +34,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
         this.isConnected = false;
       });
 
-      this.channel = (await this.connection.createChannel()) as amqp.Channel;
+      this.channel = await this.connection.createChannel();
       this.isConnected = true;
 
       // Declare queues
