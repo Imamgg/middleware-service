@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
-import { RedisService } from "./redis/redis.service";
-import { QueueService } from "./queue/queue.service";
+import { RedisService } from "../redis/redis.service";
+import { QueueService } from "../queue/queue.service";
 
 @Controller("api/health")
 export class HealthController {

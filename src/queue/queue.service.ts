@@ -20,9 +20,9 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   private async connect() {
     try {
-      this.connection = await amqp.connect(
+      this.connection = (await amqp.connect(
         this.configService.get("RABBITMQ_URL")
-      );
+      )) as amqp.Connection;
 
       this.connection.on("error", (err) => {
         console.error("RabbitMQ Connection Error:", err);
@@ -34,7 +34,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
         this.isConnected = false;
       });
 
-      this.channel = await this.connection.createChannel();
+      this.channel = (await this.connection.createChannel()) as amqp.Channel;
       this.isConnected = true;
 
       // Declare queues

@@ -1,6 +1,6 @@
 import { ConfigService } from "@nestjs/config";
-import { QueueService } from "./queue/queue.service";
-import { EmailService } from "./email/email.service";
+import { QueueService } from "../queue/queue.service";
+import { EmailService } from "../email/email.service";
 
 async function bootstrap() {
   const configService = new ConfigService();
